@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      # It is not recommended to cache node_modules
+      # source: https://github.com/actions/cache/blob/main/examples.md#node---npm
+      - name: Install Dependencies
+        run: yarn --prefer-offline --frozen-lockfile --no-progress --non-interactive
+
+      - name: Compile code
+        run: yarn build
