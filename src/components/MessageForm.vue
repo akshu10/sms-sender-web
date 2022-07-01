@@ -29,24 +29,52 @@
         Send
       </button>
     </form>
+
+    <form>
+      <button
+        type="button"
+        class="w-32 px-6 py-2.5 my-3 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+        @click="checkStatus"
+      >
+        Status
+      </button>
+      <p v-if="statusResponse">{{ statusResponse }}</p>
+    </form>
   </div>
 </template>
 
 <script>
+import MessageService from "../lib/message-service";
+
 export default {
   name: "MessageForm",
   data() {
     return {
       phone: "",
       message: "",
+      statusResponse: null,
     };
   },
   methods: {
-    onSubmit(event) {
+    async onSubmit(event) {
       event.preventDefault();
       console.log("on Submit");
       console.log(this.phone);
       console.log(this.message);
+
+      await MessageService.sendMessage({
+        token: "ad8fd46a-9f59-4940-aa80-44723fe96009",
+        to: this.phone,
+        body: this.message,
+      });
+    },
+    async checkStatus(event) {
+      event.preventDefault();
+      console.log("Check status");
+      const response = await MessageService.checkStatus();
+
+      this.statusResponse = response.data;
+      console.log(response.data);
     },
   },
 };
